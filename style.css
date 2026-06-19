@@ -1,0 +1,372 @@
+/* =============================================
+   LENSKART OPS DASHBOARD — style.css
+   ============================================= */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Segoe UI', Roboto, sans-serif;
+  background: #060910;
+  color: #fff;
+  min-height: 100vh;
+}
+
+/* ── Header ────────────────────────────────────────────── */
+.header {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  padding: 16px 36px;
+  background: #000042;
+  border-bottom: 5px solid #00bac6;
+  box-shadow: 0 4px 30px rgba(0,186,198,0.2);
+  gap: 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.live-dot {
+  width: 16px;
+  height: 16px;
+  min-width: 16px;
+  background: #ff1744;
+  border-radius: 50%;
+  box-shadow: 0 0 12px #ff1744;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink { 50% { opacity: .15; box-shadow: none; } }
+
+.title {
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 1px;
+  text-shadow: 0 0 16px rgba(0,186,198,0.4);
+}
+
+.subtitle {
+  font-size: 0.95rem;
+  color: #00bac6;
+  font-weight: 600;
+  letter-spacing: 2px;
+  margin-top: 3px;
+}
+
+.header-center { text-align: center; }
+
+.clock {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #00bac6;
+  letter-spacing: 2px;
+  text-shadow: 0 0 14px rgba(0,186,198,0.5);
+  white-space: nowrap;
+}
+
+.header-right { text-align: right; }
+
+.last-updated {
+  font-size: 0.9rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.last-updated.fresh {
+  background: rgba(0,200,83,0.15);
+  color: #69f0ae;
+  border: 1px solid #00c853;
+}
+
+.last-updated.stale {
+  background: rgba(255,171,64,0.15);
+  color: #ffab40;
+  border: 1px solid #ff6d00;
+  animation: stalePulse 2s infinite;
+}
+
+@keyframes stalePulse { 50% { border-color: #ff1744; color: #ff5252; } }
+
+/* ── Main ──────────────────────────────────────────────── */
+.main {
+  padding: 20px 24px 40px;
+  overflow-x: auto;
+}
+
+/* ── Table ─────────────────────────────────────────────── */
+.ops-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 6px;
+  min-width: 900px;
+}
+
+/* ── Header Row ─────────────────────────────────────────── */
+thead tr {
+  background: transparent;
+}
+
+thead th {
+  padding: 14px 18px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: #00bac6;
+  background: #0a0f1a;
+  border-bottom: 2px solid #00bac6;
+  white-space: nowrap;
+  text-align: center;
+}
+
+thead th:first-child { border-radius: 10px 0 0 0; text-align: center; }
+thead th:last-child  { border-radius: 0 10px 0 0; }
+
+.th-rank     { width: 48px; }
+.th-courier  { text-align: left !important; min-width: 180px; }
+.th-pickup   { min-width: 220px; }
+.th-data     { min-width: 120px; }
+.th-manifest { min-width: 120px; color: #ffd740 !important; }
+.th-subtotal { min-width: 110px; color: #ff6d00 !important; }
+
+/* ── Body Rows ──────────────────────────────────────────── */
+tbody tr {
+  transition: transform 0.15s, box-shadow 0.15s;
+  cursor: default;
+}
+
+tbody tr:hover {
+  transform: scale(1.005);
+  z-index: 2;
+  position: relative;
+}
+
+tbody td {
+  padding: 0;
+  background: transparent;
+}
+
+.row-inner {
+  display: contents;
+}
+
+/* Each cell gets card-like styling via td direct */
+tbody td {
+  padding: 15px 18px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  background: #0d1117;
+  border-top: 1px solid #1e2a3a;
+  border-bottom: 1px solid #1e2a3a;
+  text-align: center;
+  vertical-align: middle;
+}
+
+tbody td:first-child {
+  border-left: 1px solid #1e2a3a;
+  border-radius: 10px 0 0 10px;
+}
+
+tbody td:last-child {
+  border-right: 1px solid #1e2a3a;
+  border-radius: 0 10px 10px 0;
+}
+
+/* ── Row States ─────────────────────────────────────────── */
+
+/* Currently running */
+tbody tr.row-running td {
+  background: #0a1f0a;
+  border-color: #00e676;
+}
+tbody tr.row-running td:first-child {
+  border-left: 5px solid #00e676;
+}
+
+/* Upcoming soon (within 30 mins) */
+tbody tr.row-soon td {
+  background: #1a1200;
+  border-color: #ffd740;
+}
+tbody tr.row-soon td:first-child {
+  border-left: 5px solid #ffd740;
+}
+
+/* Past */
+tbody tr.row-past td {
+  background: #0a0a0a;
+  opacity: 0.5;
+}
+
+/* ── Rank Cell ──────────────────────────────────────────── */
+.cell-rank {
+  font-size: 1rem;
+  color: #546e7a;
+  font-weight: 600;
+}
+
+/* ── Courier Name ───────────────────────────────────────── */
+.cell-courier {
+  text-align: left !important;
+  font-size: 1.25rem;
+  font-weight: 900;
+  color: #fff;
+  letter-spacing: 0.3px;
+}
+
+.courier-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #161b22;
+  border: 1px solid #30363d;
+}
+
+/* ── Pickup Window ──────────────────────────────────────── */
+.cell-pickup { font-size: 1.05rem; }
+
+.pickup-running {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0,230,118,0.1);
+  border: 1px solid #00e676;
+  color: #00e676;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pickup-soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,215,64,0.1);
+  border: 1px solid #ffd740;
+  color: #ffd740;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.pickup-normal {
+  color: #90a4ae;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.pickup-past {
+  color: #37474f;
+  font-size: 1rem;
+  text-decoration: line-through;
+}
+
+/* ── Data Cells ─────────────────────────────────────────── */
+.cell-na {
+  color: #37474f;
+  font-size: 1.1rem;
+}
+
+/* ── Manifest Done ──────────────────────────────────────── */
+.manifest-high {
+  color: #ff5252;
+  font-size: 1.3rem;
+  text-shadow: 0 0 10px rgba(255,82,82,0.5);
+}
+
+.manifest-mid {
+  color: #ffd740;
+  font-size: 1.3rem;
+}
+
+.manifest-low {
+  color: #69f0ae;
+  font-size: 1.3rem;
+}
+
+.manifest-zero {
+  color: #37474f;
+  font-size: 1.1rem;
+}
+
+.manifest-unknown {
+  color: #546e7a;
+  font-size: 1rem;
+}
+
+/* ── Subtotal ───────────────────────────────────────────── */
+.cell-subtotal {
+  font-size: 1.3rem;
+  font-weight: 900;
+  color: #ff6d00;
+}
+
+.cell-subtotal-zero {
+  font-size: 1.1rem;
+  color: #37474f;
+}
+
+/* ── Grand Total Row ────────────────────────────────────── */
+.grand-total-row td {
+  padding: 18px 18px;
+  background: #000042 !important;
+  border: none !important;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #fff;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.grand-total-row td:first-child {
+  border-radius: 10px 0 0 10px !important;
+  border-left: 5px solid #00bac6 !important;
+  border-top: none !important;
+  border-bottom: none !important;
+}
+
+.grand-total-row td:last-child {
+  border-radius: 0 10px 10px 0 !important;
+}
+
+.gt-label {
+  text-align: left !important;
+  font-size: 1.3rem;
+  color: #00bac6;
+  letter-spacing: 2px;
+}
+
+.gt-cell {
+  font-size: 1.4rem;
+  color: #ffd740;
+}
+
+.gt-subtotal {
+  color: #ff6d00 !important;
+  font-size: 1.6rem !important;
+  text-shadow: 0 0 12px rgba(255,109,0,0.5);
+}
+
+/* ── Running pulse animation on row ────────────────────── */
+@keyframes rowPulse {
+  50% { background: #0d2b0d; }
+}
+
+tbody tr.row-running td {
+  animation: rowPulse 2s infinite;
+}
+
+/* ── Scrollbar ──────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0a0f1a; }
+::-webkit-scrollbar-thumb { background: #00bac6; border-radius: 3px; }
