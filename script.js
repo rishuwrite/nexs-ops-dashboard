@@ -5,7 +5,7 @@
  * Grand Total row at bottom
  */
 
-const SHEET_GET_URL     = "https://script.google.com/macros/s/AKfycbwDjSwykFzMWHerWI0SA_ROS0uKYSpE09eWY5NaLzUlqG39O2h3W3bfzAWsy7-SYVVW/exec";
+const SHEET_GET_URL     = "https://script.google.com/macros/s/AKfycby2xeJeM81Pk5lky5tscZnXgj0KuP6iN9H6Q7TbZtMXMsJWWFi0k9DPlhF03x2S_T78/exec";
 const COUNTS_REFRESH_MS = 30_000;
 
 // ── 16 couriers ───────────────────────────────────────────────────────────────
@@ -17,8 +17,14 @@ const COURIERS = [
 ];
 
 let pickupData  = []; // all 42 slots from pickups.json
-let counts      = {}; // { BLUEDART: 12, ... } from sheet
+let counts      = {
+  manifest: {},
+  b2c: {},
+  b2b: {},
+  storePacking: {},
+}; // grouped counts from sheet
 let lastUpdated = null;
+let monitorUpdated = null;
 
 // ── Time helpers ──────────────────────────────────────────────────────────────
 function toMin(t) {
@@ -85,12 +91,16 @@ function getNextSlot(courierName, nowMin) {
 
 // ── Build 16-courier rows sorted by next pickup ───────────────────────────────
 function buildRows(nowMin) {
+  const hasData = hasAnyCounts();
   return COURIERS
     .map(courier => {
-      const slot      = getNextSlot(courier, nowMin);
-      const manifest  = Object.keys(counts).length === 0 ? null : (counts[courier] ?? 0);
-      const subtotal  = manifest !== null ? manifest : null; // add other cols later
-      return { courier, slot, manifest, subtotal };
+      const slot         = getNextSlot(courier, nowMin);
+      const storePacking = hasData ? (counts.storePacking[courier] ?? 0) : null;
+      const b2c          = hasData ? (counts.b2c[courier] ?? 0) : null;
+      const b2b          = hasData ? (counts.b2b[courier] ?? 0) : null;
+      const manifest     = hasData ? (counts.manifest[courier] ?? 0) : null;
+      const subtotal     = hasData ? storePacking + b2c + b2b + manifest : null;
+      return { courier, slot, storePacking, b2c, b2b, manifest, subtotal };
     })
     .sort((a, b) => {
       // Sort by next pickup norm time
@@ -98,6 +108,25 @@ function buildRows(nowMin) {
       const normB = b.slot ? (b.slot.norm ?? (b.slot.startMin <= nowMin ? b.slot.startMin + 1440 : b.slot.startMin)) : 9999;
       return normA - normB;
     });
+}
+
+function hasAnyCounts() {
+  return ["manifest", "b2c", "b2b", "storePacking"]
+    .some(group => Object.keys(counts[group] || {}).length > 0);
+}
+
+function getValueClass(val, group) {
+  if (val === null) return "value-unknown";
+  if (val === 0) return "value-zero";
+  if (group === "storePacking" && val >= 300) return "value-high";
+  if (group !== "storePacking" && val >= 100) return "value-high";
+  if (val >= 30) return "value-mid";
+  return "value-low";
+}
+
+function valueCell(val, group) {
+  if (val === null) return `<td class="value-unknown">—</td>`;
+  return `<td class="${getValueClass(val, group)}">${val}</td>`;
 }
 
 // ── Manifest cell ─────────────────────────────────────────────────────────────
@@ -151,24 +180,43 @@ function renderTable() {
       <td class="cell-rank">${i + 1}</td>
       <td class="cell-courier"><span class="courier-badge">${r.courier}</span></td>
       ${pickupCell(r.slot)}
-      <td class="cell-na">—</td>
-      <td class="cell-na">—</td>
-      <td class="cell-na">—</td>
+      ${valueCell(r.storePacking, "storePacking")}
+      ${valueCell(r.b2c, "b2c")}
+      ${valueCell(r.b2b, "b2b")}
       ${manifestCell(r.manifest)}
       ${subtotalCell(r.subtotal)}
     </tr>
   `).join("");
 
   // ── Grand Total ────────────────────────────────────────────────────────────
-  const totalManifest = Object.keys(counts).length === 0
-    ? null
-    : COURIERS.reduce((sum, c) => sum + (counts[c] ?? 0), 0);
+  const hasData = hasAnyCounts();
+  const totalStore    = hasData ? COURIERS.reduce((sum, c) => sum + (counts.storePacking[c] ?? 0), 0) : null;
+  const totalB2C      = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2c[c] ?? 0), 0) : null;
+  const totalB2B      = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2b[c] ?? 0), 0) : null;
+  const totalManifest = hasData ? COURIERS.reduce((sum, c) => sum + (counts.manifest[c] ?? 0), 0) : null;
+  const grandTotal    = hasData ? totalStore + totalB2C + totalB2B + totalManifest : null;
 
-  document.getElementById("gt-store").textContent    = "—";
-  document.getElementById("gt-b2c").textContent      = "—";
-  document.getElementById("gt-b2b").textContent      = "—";
+  document.getElementById("gt-store").textContent    = totalStore !== null ? totalStore : "—";
+  document.getElementById("gt-b2c").textContent      = totalB2C !== null ? totalB2C : "—";
+  document.getElementById("gt-b2b").textContent      = totalB2B !== null ? totalB2B : "—";
   document.getElementById("gt-manifest").textContent = totalManifest !== null ? totalManifest : "—";
-  document.getElementById("gt-subtotal").textContent = totalManifest !== null ? totalManifest : "—";
+  document.getElementById("gt-subtotal").textContent = grandTotal !== null ? grandTotal : "—";
+}
+
+function numberValue(v) {
+  const n = Number(v);
+  return Number.isFinite(n) ? n : 0;
+}
+
+function extractGroup(data, prefix) {
+  const group = {};
+  COURIERS.forEach(c => {
+    const key = `${prefix}_${c}`;
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      group[c] = numberValue(data[key]);
+    }
+  });
+  return group;
 }
 
 // ── Fetch counts ──────────────────────────────────────────────────────────────
@@ -180,15 +228,17 @@ async function fetchCounts() {
     if (data.error) throw new Error(data.error);
 
     lastUpdated = data.timestamp || null;
-    const nc = {};
-    Object.entries(data).forEach(([k, v]) => {
-      if (k !== "timestamp" && typeof v === "number") nc[k] = v;
-    });
-    counts = nc;
+    monitorUpdated = data.monitorTimestamp || null;
+    counts = {
+      manifest: extractGroup(data, "manifest"),
+      b2c: extractGroup(data, "b2c"),
+      b2b: extractGroup(data, "b2b"),
+      storePacking: extractGroup(data, "storePacking"),
+    };
 
     const el = document.getElementById("lastUpdated");
     if (lastUpdated) {
-      el.textContent = `📊 Last push: ${lastUpdated}`;
+      el.textContent = `📊 Last push: ${lastUpdated}${monitorUpdated ? " · Monitor: " + monitorUpdated : ""}`;
       el.className = "last-updated fresh";
     }
   } catch (err) {
@@ -199,7 +249,7 @@ async function fetchCounts() {
 // ── Init ──────────────────────────────────────────────────────────────────────
 async function init() {
   try {
-    const res  = await fetch("data/pickups.json?v=1");
+    const res  = await fetch("data/pickups.json");
     pickupData = await res.json();
   } catch (e) {
     console.warn("pickups.json failed:", e);

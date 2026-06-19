@@ -277,6 +277,32 @@ tbody tr.row-past td {
   font-size: 1.1rem;
 }
 
+.value-high {
+  color: #ff5252;
+  font-size: 1.3rem;
+  text-shadow: 0 0 10px rgba(255,82,82,0.45);
+}
+
+.value-mid {
+  color: #ffd740;
+  font-size: 1.25rem;
+}
+
+.value-low {
+  color: #69f0ae;
+  font-size: 1.2rem;
+}
+
+.value-zero {
+  color: #37474f;
+  font-size: 1.05rem;
+}
+
+.value-unknown {
+  color: #546e7a;
+  font-size: 1rem;
+}
+
 /* ── Manifest Done ──────────────────────────────────────── */
 .manifest-high {
   color: #ff5252;
