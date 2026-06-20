@@ -1,6 +1,6 @@
 const SHEET_GET_URL = "https://script.google.com/macros/s/AKfycby2xeJeM81Pk5lky5tscZnXgj0KuP6iN9H6Q7TbZtMXMsJWWFi0k9DPlhF03x2S_T78/exec";
 const COUNTS_REFRESH_MS = 10_000;
-const FULL_VIEW_MS = 5_000;
+const FULL_VIEW_MS = 7_000;
 const GROUP_VIEW_MS = 5_000;
 const GROUP_SIZE = 4;
 
