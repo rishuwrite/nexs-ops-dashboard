@@ -92,7 +92,6 @@ body {
   height: var(--header-h);
   padding: 12px 28px;
   background: #080d15;
-  border-bottom: 6px solid var(--page-accent, var(--brand));
 }
 
 .header-left {
