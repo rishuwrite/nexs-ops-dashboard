@@ -87,11 +87,11 @@ function buildRows(nowMin) {
   return COURIERS
     .map(courier => {
       const slot = getNextSlot(courier, nowMin);
-      const storePacking = hasData ? (counts.storePacking[courier] ?? 0) : null;
-      const b2c = hasData ? (counts.b2c[courier] ?? 0) : null;
-      const b2b = hasData ? (counts.b2b[courier] ?? 0) : null;
-      const manifest = hasData ? (counts.manifest[courier] ?? 0) : null;
-      const subtotal = hasData ? storePacking + b2c + b2b + manifest : null;
+      const storePacking = hasData ? (counts.storePacking[courier] ?? 0) : 0;
+      const b2c = hasData ? (counts.b2c[courier] ?? 0) : 0;
+      const b2b = hasData ? (counts.b2b[courier] ?? 0) : 0;
+      const manifest = hasData ? (counts.manifest[courier] ?? 0) : 0;
+      const subtotal = storePacking + b2c + b2b + manifest;
       return { courier, slot, storePacking, b2c, b2b, manifest, subtotal };
     })
     .sort((a, b) => {
@@ -149,7 +149,7 @@ function hasAnyCounts() {
 }
 
 function getValueClass(val, group) {
-  if (val === null) return "value-unknown";
+  if (val === null) return "value-zero";
   if (val === 0) return "value-zero";
   if (group === "storePacking" && val >= 300) return "value-high";
   if (group !== "storePacking" && val >= 100) return "value-high";
@@ -158,12 +158,12 @@ function getValueClass(val, group) {
 }
 
 function valueCell(val, group) {
-  if (val === null) return `<td class="value-unknown">-</td>`;
+  if (val === null) return `<td class="value-zero">0</td>`;
   return `<td class="${getValueClass(val, group)}">${val}</td>`;
 }
 
 function manifestCell(val) {
-  if (val === null) return `<td class="manifest-unknown">-</td>`;
+  if (val === null) return `<td class="manifest-zero">0</td>`;
   if (val === 0) return `<td class="manifest-zero">0</td>`;
   if (val >= 100) return `<td class="manifest-high">${val}</td>`;
   if (val >= 30) return `<td class="manifest-mid">${val}</td>`;
@@ -172,7 +172,7 @@ function manifestCell(val) {
 
 function subtotalCell(val) {
   if (val === null || val === 0) {
-    return `<td class="cell-subtotal-zero">${val === null ? "-" : "0"}</td>`;
+    return `<td class="cell-subtotal-zero">0</td>`;
   }
   return `<td class="cell-subtotal">${val}</td>`;
 }
@@ -223,17 +223,17 @@ function renderTable() {
   `).join("");
 
   const hasData = hasAnyCounts();
-  const totalStore = hasData ? COURIERS.reduce((sum, c) => sum + (counts.storePacking[c] ?? 0), 0) : null;
-  const totalB2C = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2c[c] ?? 0), 0) : null;
-  const totalB2B = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2b[c] ?? 0), 0) : null;
-  const totalManifest = hasData ? COURIERS.reduce((sum, c) => sum + (counts.manifest[c] ?? 0), 0) : null;
-  const grandTotal = hasData ? totalStore + totalB2C + totalB2B + totalManifest : null;
+  const totalStore = hasData ? COURIERS.reduce((sum, c) => sum + (counts.storePacking[c] ?? 0), 0) : 0;
+  const totalB2C = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2c[c] ?? 0), 0) : 0;
+  const totalB2B = hasData ? COURIERS.reduce((sum, c) => sum + (counts.b2b[c] ?? 0), 0) : 0;
+  const totalManifest = hasData ? COURIERS.reduce((sum, c) => sum + (counts.manifest[c] ?? 0), 0) : 0;
+  const grandTotal = totalStore + totalB2C + totalB2B + totalManifest;
 
-  document.getElementById("gt-store").textContent = totalStore !== null ? totalStore : "-";
-  document.getElementById("gt-b2c").textContent = totalB2C !== null ? totalB2C : "-";
-  document.getElementById("gt-b2b").textContent = totalB2B !== null ? totalB2B : "-";
-  document.getElementById("gt-manifest").textContent = totalManifest !== null ? totalManifest : "-";
-  document.getElementById("gt-subtotal").textContent = grandTotal !== null ? grandTotal : "-";
+  document.getElementById("gt-store").textContent = totalStore;
+  document.getElementById("gt-b2c").textContent = totalB2C;
+  document.getElementById("gt-b2b").textContent = totalB2B;
+  document.getElementById("gt-manifest").textContent = totalManifest;
+  document.getElementById("gt-subtotal").textContent = grandTotal;
 }
 
 function numberValue(v) {
