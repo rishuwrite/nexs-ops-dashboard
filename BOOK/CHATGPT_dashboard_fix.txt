@@ -1,0 +1,15 @@
+FINAL DASHBOARD FIX
+
+Replace the dashboard autoLogin() function with the autoLogin() from Bookmarklet (2).
+
+Required fixes:
+1. Add credentials:"include" to LOGIN request.
+2. Add credentials:"include" to AUTHME request.
+3. Remove Authorization: Bearer loginData.content header.
+4. Add logout -> wait 500ms -> login -> authme flow.
+5. Keep source-domain header.
+6. Save token to localStorage and sessionStorage.
+
+Reason:
+Bookmarklet (2) rebuilds the cookie session correctly after logout.
+Dashboard(1) relies on a token flow that can fail after session expiry.
