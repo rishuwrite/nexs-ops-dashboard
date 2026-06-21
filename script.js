@@ -2,13 +2,13 @@ const SHEET_GET_URL = "https://script.google.com/macros/s/AKfycby2xeJeM81Pk5lky5
 const COUNTS_REFRESH_MS = 10_000;
 const FULL_VIEW_MS = 7_000;
 const GROUP_VIEW_MS = 5_000;
-const GROUP_SIZE = 4;
+const GROUP_SIZE = 5;
 
 const COURIERS = [
   "BLITZNDD", "BLUEDART", "BUSYBEESPPD", "BusybeesSDD",
   "DELCARTB2B", "DELHIVERY", "DELHIVERYPDS", "DOT",
   "DTDCVB2B", "FASTBEETLE", "GPSUPPLY", "PURPLEDRONE",
-  "SHADOWFAX", "shreerajxpress", "Velocity", "XPRESSBEES"
+  "SHADOWFAX", "SHADOWFAXNCR", "shreerajxpress", "Velocity", "XPRESSBEES"
 ];
 
 let pickupData = [];
@@ -112,7 +112,7 @@ function getBoardCycle() {
     };
   }
 
-  const page = Math.floor((elapsed - FULL_VIEW_MS) / GROUP_VIEW_MS);
+  const page = Math.min(Math.floor((elapsed - FULL_VIEW_MS) / GROUP_VIEW_MS), 3);
   return {
     mode: "group",
     page,
@@ -283,7 +283,7 @@ async function fetchCounts() {
 
 async function init() {
   try {
-    const res = await fetch("data/pickups.json");
+    const res = await fetch("data/pickups.json?v=1");
     pickupData = await res.json();
   } catch (e) {
     console.warn("pickups.json failed:", e);

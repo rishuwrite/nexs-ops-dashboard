@@ -32,6 +32,7 @@
   {"name": "Velocity RD 4",        "start": "09:30 PM", "end": "10:00 PM"},
   {"name": "PURPLEDRONE RD 7",     "start": "09:30 PM", "end": "10:00 PM"},
   {"name": "SHADOWFAX RD 1",       "start": "10:15 PM", "end": "10:30 PM"},
+  {"name": "SHADOWFAXNCR RD 1",    "start": "09:30 AM", "end": "10:00 AM"},
   {"name": "shreerajxpress RD 2",  "start": "10:30 PM", "end": "11:00 PM"},
   {"name": "DELHIVERYPDS RD 2",    "start": "11:00 PM", "end": "11:30 PM"},
   {"name": "BUSYBEESPPD RD 2",     "start": "11:00 PM", "end": "11:30 PM"},

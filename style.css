@@ -277,7 +277,7 @@ thead th:last-child {
 }
 
 tbody tr {
-  height: calc((100dvh - var(--header-h) - var(--board-h) - var(--all-head-h) - var(--all-total-h) - 114px) / 16);
+  height: calc((100dvh - var(--header-h) - var(--board-h) - var(--all-head-h) - var(--all-total-h) - 114px) / 17);
 }
 
 tbody td {
@@ -454,7 +454,7 @@ tbody tr.row-soon td:first-child {
 }
 
 .ops-table.focus-view tbody tr {
-  height: calc((100dvh - var(--header-h) - var(--board-h) - var(--focus-head-h) - 34px) / 4);
+  height: calc((100dvh - var(--header-h) - var(--board-h) - var(--focus-head-h) - 34px) / 5);
 }
 
 .ops-table.focus-view tbody td {
